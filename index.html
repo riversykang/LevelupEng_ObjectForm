@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>레벨업 문법 공부</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #120f6b;
+        font-family: "Pretendard", sans-serif;
+      }
+
+      .canvas {
+        width: calc(100vh * 375 / 812);
+        max-width: 100vw;
+        height: 100vh;
+        background: #3e3be2;
+        border-radius: 32px;
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.35);
+        color: #f5f5f5;
+        font-weight: 500;
+        text-align: center;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .screen {
+        position: absolute;
+        inset: 0;
+        padding: 48px 36px 36px;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .screen--active {
+        display: flex;
+      }
+
+      .logo-text {
+        font-size: 18px;
+        letter-spacing: 0.04em;
+      }
+
+      .title-art {
+        width: 100%;
+        max-width: 280px;
+        margin-top: 62px;
+      }
+
+      .tagline {
+        margin: 165px 0 55px;
+        font-size: 18px;
+        line-height: 1.4;
+      }
+
+      .illust {
+        width: 100%;
+        max-width: 280px;
+        flex-grow: 1;
+        object-fit: contain;
+      }
+
+      .cta {
+        width: 100%;
+        border: none;
+        border-radius: 999px;
+        background: #ffffff;
+        color: #2e32c5;
+        font-size: 18px;
+        font-weight: 600;
+        padding: 18px 0;
+        cursor: pointer;
+        box-shadow: 0 12px 25px rgba(16, 12, 94, 0.35);
+        transition: transform 0.2s;
+      }
+
+      .cta:active {
+        transform: translateY(2px);
+      }
+
+      .quiz-progress {
+        font-size: 16px;
+        letter-spacing: 0.05em;
+      }
+
+      .quiz-word {
+        font-size: 46px;
+        font-weight: 700;
+        margin-top: clamp(70px, 32vh, 160px);
+      }
+
+      .quiz-screen {
+        justify-content: flex-start;
+        padding: 48px 36px 28px;
+      }
+
+      .meaning-screen {
+        justify-content: flex-start;
+        padding: 48px 36px 36px;
+      }
+
+      .result-screen {
+        justify-content: flex-start;
+        padding: 48px 36px 36px;
+      }
+
+      .quiz-top {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .home-btn {
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        border: none;
+        background: rgba(255, 255, 255, 0.18);
+        color: #fdfdff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(38, 33, 148, 0.2);
+        transition: background 0.2s, transform 0.2s;
+      }
+
+      .home-btn:active {
+        transform: translateY(2px);
+      }
+
+      .home-btn svg {
+        width: 26px;
+        height: 26px;
+      }
+
+      .quiz-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 6px;
+        text-align: right;
+      }
+
+      .quiz-score {
+        font-size: 14pt;
+        font-weight: 600;
+      }
+
+      .quiz-actions {
+        width: 100%;
+        margin-top: auto;
+        padding-bottom: 12px;
+      }
+
+      .question-label {
+        font-size: 14pt;
+        margin-bottom: 60px;
+        opacity: 0.85;
+      }
+
+      .options {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .option-btn {
+        width: 100%;
+        border: none;
+        border-radius: 18px;
+        padding: 20px 14px;
+        background: rgba(255, 255, 255, 0.2);
+        color: #fdfdff;
+        font-size: 18px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.2s;
+      }
+
+      .option-btn:active {
+        transform: translateY(2px);
+      }
+
+      .option-btn.correct {
+        background: #b5ff7d;
+        color: #103b05;
+      }
+
+      .option-btn.wrong {
+        background: #ff9090;
+      }
+
+      .option-btn.disabled {
+        pointer-events: none;
+      }
+
+      .meaning-text {
+        margin-top: 16px;
+        font-size: 18px;
+        line-height: 1.5;
+      }
+
+      .meaning-options {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        margin-top: auto;
+      }
+
+      .meaning-screen .quiz-word {
+        margin-top: clamp(40px, 28vh, 140px);
+      }
+
+      .result-headline {
+        font-size: 18px;
+        margin-bottom: 12px;
+      }
+
+      .result-tagline {
+        margin: 32px 0 28px;
+        font-size: 18px;
+        line-height: 1.4;
+      }
+
+      .result-score {
+        font-size: 90px;
+        line-height: 1;
+        margin-bottom: 8px;
+      }
+
+      .result-max {
+        font-size: 26px;
+        opacity: 0.8;
+        margin-bottom: 171px;
+      }
+
+      .result-cta {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        margin-top: auto;
+      }
+
+      .secondary-btn {
+        width: 100%;
+        border: 2px solid rgba(255, 255, 255, 0.6);
+        border-radius: 999px;
+        padding: 16px 0;
+        background: transparent;
+        color: inherit;
+        font-size: 18px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: opacity 0.2s;
+      }
+
+      .secondary-btn:active {
+        opacity: 0.8;
+      }
+
+      .review-drawer {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -100%;
+        background: #fefefe;
+        border-radius: 32px 32px 0 0;
+        padding: 32px 24px 48px;
+        color: #212121;
+        box-shadow: 0 -12px 60px rgba(0, 0, 0, 0.35);
+        transition: transform 0.35s ease;
+        transform: translateY(100%);
+        max-height: 85%;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .review-drawer.open {
+        transform: translateY(0);
+        bottom: 0;
+      }
+
+      .drawer-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      .drawer-title {
+        font-size: 22px;
+        font-weight: 700;
+      }
+
+      .drawer-close {
+        border: none;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        background: rgba(0, 0, 0, 0.08);
+        font-size: 22px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .review-body {
+        flex: 1;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 16px;
+      }
+
+      th,
+      td {
+        text-align: left;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      }
+
+      th {
+        font-weight: 700;
+      }
+
+      @media (max-height: 812px) {
+        .canvas {
+          width: 100vw;
+          height: min(812px, calc(100vw * 812 / 375));
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="canvas">
+      <section class="screen screen--active" id="start-screen">
+        <p class="logo-text">레벨업 잉글리쉬</p>
+        <img class="title-art" src="Title.svg" alt="To부정사 VS 동명사 제목" />
+        <p class="tagline">목적어 형태를<br />마스터 해보자! 멍!</p>
+        <img class="illust" src="Illust.svg" alt="귀여운 강아지 일러스트" />
+        <button class="cta" type="button" id="start-btn">시작하기</button>
+      </section>
+
+      <section class="screen quiz-screen" id="quiz-screen">
+        <div class="quiz-top">
+          <button class="home-btn" data-home type="button" aria-label="홈으로 돌아가기">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 11 12 3l9 8" />
+              <path d="M6.5 9.5V21h5v-5h1.8v5H18v-9.5" />
+            </svg>
+          </button>
+          <div class="quiz-info">
+            <span class="quiz-progress" data-progress>1 / 3</span>
+            <span class="quiz-score" data-score>정답:0 오답:0</span>
+          </div>
+        </div>
+        <div class="quiz-word" id="main-word">promise</div>
+        <div class="quiz-actions">
+          <p class="question-label">목적어로 들어갈 수 있는 형태는?</p>
+          <div class="options">
+            <button class="option-btn" data-option="inf">
+              To부정사 (to+동.원)
+            </button>
+            <button class="option-btn" data-option="ger">동명사 (V-ing)</button>
+            <button class="option-btn" data-option="both">둘 다 가능</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen meaning-screen" id="meaning-screen">
+        <div class="quiz-top">
+          <button class="home-btn" data-home type="button" aria-label="홈으로 돌아가기">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 11 12 3l9 8" />
+              <path d="M6.5 9.5V21h5v-5h1.8v5H18v-9.5" />
+            </svg>
+          </button>
+          <div class="quiz-info">
+            <span class="quiz-progress" data-progress>1 / 3</span>
+            <span class="quiz-score" data-score>정답:0 오답:0</span>
+          </div>
+        </div>
+        <div>
+          <div class="quiz-word" id="meaning-word">remember</div>
+          <p class="meaning-text" id="meaning-desc">앞으로 ~할 것을 기억하다</p>
+        </div>
+        <div class="meaning-options">
+          <button class="option-btn" data-meaning-option="inf">
+            To부정사 (to+동.원)
+          </button>
+          <button class="option-btn" data-meaning-option="ger">
+            동명사 (V-ing)
+          </button>
+        </div>
+      </section>
+
+      <section class="screen result-screen" id="result-screen">
+        <p class="result-headline">나의 점수는</p>
+        <p class="result-score" id="result-score">00점</p>
+        <p class="result-max" id="result-max">/ 55점</p>
+        <p class="tagline result-tagline" id="result-tagline">
+          에구구!<br />좀 더 분발해보자! 멍!
+        </p>
+        <img class="illust" src="Illust.svg" alt="결과 일러스트" />
+        <div class="result-cta">
+          <button class="secondary-btn" id="review-btn">오답 복습</button>
+          <button class="cta" type="button" id="restart-btn">다시 하기</button>
+        </div>
+        <div class="review-drawer" id="review-drawer">
+          <div class="drawer-header">
+            <span class="drawer-title">오답 복습</span>
+            <button class="drawer-close" id="drawer-close" aria-label="닫기">
+              ×
+            </button>
+          </div>
+          <div class="review-body">
+            <table>
+              <thead>
+                <tr>
+                  <th>동사</th>
+                  <th>정답</th>
+                </tr>
+              </thead>
+              <tbody id="review-list"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const startScreen = document.getElementById("start-screen");
+      const quizScreen = document.getElementById("quiz-screen");
+      const meaningScreen = document.getElementById("meaning-screen");
+      const resultScreen = document.getElementById("result-screen");
+      const startBtn = document.getElementById("start-btn");
+      const restartBtn = document.getElementById("restart-btn");
+      const reviewBtn = document.getElementById("review-btn");
+      const reviewDrawer = document.getElementById("review-drawer");
+      const drawerClose = document.getElementById("drawer-close");
+      const reviewList = document.getElementById("review-list");
+      const mainWord = document.getElementById("main-word");
+      const meaningWord = document.getElementById("meaning-word");
+      const meaningDesc = document.getElementById("meaning-desc");
+      const resultScore = document.getElementById("result-score");
+      const resultMax = document.getElementById("result-max");
+      const resultTagline = document.getElementById("result-tagline");
+      const progressDisplays = Array.from(
+        document.querySelectorAll("[data-progress]")
+      );
+      const scoreDisplays = Array.from(document.querySelectorAll("[data-score]"));
+      const homeButtons = Array.from(document.querySelectorAll("[data-home]"));
+      const optionButtons = Array.from(
+        document.querySelectorAll(".options .option-btn")
+      );
+      const meaningButtons = Array.from(
+        document.querySelectorAll(".meaning-options .option-btn")
+      );
+
+      const INF_WORDS = [
+        "want",
+        "hope",
+        "plan",
+        "decide",
+        "promise",
+        "agree",
+        "refuse",
+        "expect",
+        "learn",
+        "need",
+        "manage",
+        "fail",
+        "pretend",
+        "offer",
+        "afford",
+        "attempt",
+        "ask",
+        "choose",
+        "prepare",
+        "deserve",
+        "mean",
+      ];
+
+      const GER_WORDS = [
+        "enjoy",
+        "finish",
+        "avoid",
+        "mind",
+        "give up",
+        "suggest",
+        "recommend",
+        "consider",
+        "deny",
+        "practice",
+        "admit",
+        "imagine",
+        "keep",
+        "postpone",
+        "delay",
+        "risk",
+        "miss",
+      ];
+
+      const BOTH_WORDS = [
+        "like",
+        "love",
+        "hate",
+        "prefer",
+        "start",
+        "begin",
+        "continue",
+      ];
+
+      const shuffle = (list) => {
+        const arr = [...list];
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      };
+
+      const quizPool = [
+        ...INF_WORDS.map((word) => ({ word, answer: "inf" })),
+        ...GER_WORDS.map((word) => ({ word, answer: "ger" })),
+        ...BOTH_WORDS.map((word) => ({ word, answer: "both" })),
+      ];
+
+      const MEANING_QUIZ = [
+        {
+          verb: "remember",
+          meaning: "앞으로 ~할 것을 기억하다",
+          answer: "inf",
+        },
+        {
+          verb: "remember",
+          meaning: "과거에 했던 것을 기억하다",
+          answer: "ger",
+        },
+        {
+          verb: "forget",
+          meaning: "할 일을 잊다",
+          answer: "inf",
+        },
+        {
+          verb: "forget",
+          meaning: "과거에 했던 일을 잊다/기억 안 남",
+          answer: "ger",
+        },
+        {
+          verb: "stop",
+          meaning: "~하기 위해 멈추다",
+          answer: "inf",
+        },
+        {
+          verb: "stop",
+          meaning: "~하는 것을 멈추다",
+          answer: "ger",
+        },
+        {
+          verb: "try",
+          meaning: "노력하다, 힘들게 시도하다",
+          answer: "inf",
+        },
+        {
+          verb: "try",
+          meaning: "시험 삼아 해보다",
+          answer: "ger",
+        },
+        {
+          verb: "regret",
+          meaning: "~하게 되어 유감이다 (현재/미래)",
+          answer: "inf",
+        },
+        {
+          verb: "regret",
+          meaning: "~했던 것을 후회하다 (과거)",
+          answer: "ger",
+        },
+      ];
+
+      const buildMainQuiz = () => shuffle(quizPool).slice(0, 30);
+      const buildMeaningQuiz = () => shuffle(MEANING_QUIZ);
+
+      let mainQuiz = buildMainQuiz();
+      let meaningQuiz = buildMeaningQuiz();
+      let currentIndex = 0;
+      let meaningIndex = 0;
+      let timeoutId;
+      let correctCount = 0;
+      let wrongCount = 0;
+      let phase = "main";
+      let wrongAnswers = [];
+
+      const updateScore = () => {
+        scoreDisplays.forEach(
+          (el) => (el.textContent = `정답:${correctCount} 오답:${wrongCount}`)
+        );
+      };
+
+      const setProgress = (current, total) => {
+        progressDisplays.forEach(
+          (el) => (el.textContent = `${current} / ${total}`)
+        );
+      };
+
+      const getResultMessage = (score) => {
+        if (score >= 40) {
+          return "우와우!<br />너는 이미 목적어 마스터! 멍!";
+        }
+        if (score >= 30) {
+          return "대단한데!<br />만점을 향해 가보자! 멍!";
+        }
+        if (score >= 20) {
+          return "잘 하고 있어!<br />한 번 더 해보자! 멍!";
+        }
+        if (score >= 10) {
+          return "괜찮아!<br />한 번 더 해보자! 멍!";
+        }
+        return "에구구!<br />좀 더 분발해보자! 멍!";
+      };
+
+      const showScreen = (target) => {
+        [startScreen, quizScreen, meaningScreen, resultScreen].forEach((el) =>
+          el.classList.remove("screen--active")
+        );
+        if (target === "start") {
+          startScreen.classList.add("screen--active");
+        } else if (target === "meaning") {
+          meaningScreen.classList.add("screen--active");
+        } else if (target === "result") {
+          resultScreen.classList.add("screen--active");
+        } else {
+          quizScreen.classList.add("screen--active");
+        }
+      };
+
+      const renderMainQuestion = () => {
+        phase = "main";
+        const item = mainQuiz[currentIndex];
+        mainWord.textContent = item.word;
+        setProgress(currentIndex + 1, mainQuiz.length);
+        optionButtons.forEach((btn) => {
+          btn.classList.remove("correct", "wrong", "disabled");
+        });
+        showScreen("main");
+      };
+
+      const renderMeaningQuestion = () => {
+        phase = "meaning";
+        const item = meaningQuiz[meaningIndex];
+        meaningWord.textContent = item.verb;
+        meaningDesc.textContent = item.meaning;
+        setProgress(meaningIndex + 1, meaningQuiz.length);
+        meaningButtons.forEach((btn) => {
+          btn.classList.remove("correct", "wrong", "disabled");
+        });
+        showScreen("meaning");
+      };
+
+      const resetGameState = () => {
+        clearTimeout(timeoutId);
+        currentIndex = 0;
+        meaningIndex = 0;
+        correctCount = 0;
+        wrongCount = 0;
+        mainQuiz = buildMainQuiz();
+        meaningQuiz = buildMeaningQuiz();
+        phase = "main";
+        wrongAnswers = [];
+        updateScore();
+      };
+
+      const startGame = () => {
+        resetGameState();
+        reviewDrawer.classList.remove("open");
+        renderMainQuestion();
+      };
+
+      const returnHome = () => {
+        resetGameState();
+        reviewDrawer.classList.remove("open");
+        showScreen("start");
+      };
+
+      const renderResult = () => {
+        const totalQuestions = mainQuiz.length + meaningQuiz.length;
+        const totalScore = correctCount;
+        resultScore.textContent = `${totalScore}점`;
+        resultMax.textContent = `/ ${totalQuestions}점`;
+        resultTagline.innerHTML = getResultMessage(totalScore);
+        reviewList.innerHTML = "";
+        if (wrongAnswers.length === 0) {
+          const row = document.createElement("tr");
+          row.innerHTML =
+            '<td colspan="2" style="text-align:center;padding:20px 0">오답 없이 모두 맞혔어요!</td>';
+          reviewList.appendChild(row);
+        } else {
+          wrongAnswers.forEach(({ word, correctLabel }) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `<td>${word}</td><td>${correctLabel}</td>`;
+            reviewList.appendChild(row);
+          });
+        }
+        showScreen("result");
+      };
+
+      const scheduleNext = () => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          if (phase === "main") {
+            currentIndex += 1;
+            if (currentIndex >= mainQuiz.length) {
+              meaningIndex = 0;
+              renderMeaningQuestion();
+            } else {
+              renderMainQuestion();
+            }
+          } else {
+            meaningIndex += 1;
+            if (meaningIndex >= meaningQuiz.length) {
+              renderResult();
+            } else {
+              renderMeaningQuestion();
+            }
+          }
+        }, 1500);
+      };
+
+      const handleOptionClick = (event) => {
+        const target = event.currentTarget;
+        if (target.classList.contains("disabled")) return;
+        optionButtons.forEach((btn) => btn.classList.add("disabled"));
+
+        const correct = mainQuiz[currentIndex].answer;
+        if (target.dataset.option === correct) {
+          target.classList.add("correct");
+          correctCount += 1;
+        } else {
+          target.classList.add("wrong");
+          wrongCount += 1;
+          const correctBtn = optionButtons.find(
+            (btn) => btn.dataset.option === correct
+          );
+          correctBtn.classList.add("correct");
+          wrongAnswers.push({
+            word: mainQuiz[currentIndex].word,
+            correctLabel: correctBtn.textContent.trim(),
+          });
+        }
+        updateScore();
+        scheduleNext();
+      };
+
+      const handleMeaningClick = (event) => {
+        const target = event.currentTarget;
+        if (target.classList.contains("disabled")) return;
+
+        meaningButtons.forEach((btn) => btn.classList.add("disabled"));
+
+        const correct = meaningQuiz[meaningIndex].answer;
+        if (target.dataset.meaningOption === correct) {
+          target.classList.add("correct");
+          correctCount += 1;
+        } else {
+          target.classList.add("wrong");
+          wrongCount += 1;
+          const correctBtn = meaningButtons.find(
+            (btn) => btn.dataset.meaningOption === correct
+          );
+          correctBtn.classList.add("correct");
+          wrongAnswers.push({
+            word: `${meaningQuiz[meaningIndex].verb}`,
+            correctLabel: correctBtn.textContent.trim(),
+          });
+        }
+        updateScore();
+        scheduleNext();
+      };
+
+      updateScore();
+      startBtn.addEventListener("click", startGame);
+      restartBtn.addEventListener("click", returnHome);
+      reviewBtn.addEventListener("click", () =>
+        reviewDrawer.classList.add("open")
+      );
+      drawerClose.addEventListener("click", () =>
+        reviewDrawer.classList.remove("open")
+      );
+      homeButtons.forEach((btn) => btn.addEventListener("click", returnHome));
+      optionButtons.forEach((btn) =>
+        btn.addEventListener("click", handleOptionClick)
+      );
+      meaningButtons.forEach((btn) =>
+        btn.addEventListener("click", handleMeaningClick)
+      );
+    </script>
+  </body>
+</html>
