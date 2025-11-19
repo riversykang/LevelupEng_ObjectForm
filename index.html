@@ -40,7 +40,8 @@
       .screen {
         position: absolute;
         inset: 0;
-        padding: 48px 36px 36px;
+        padding: clamp(32px, 6vh, 48px) clamp(20px, 6vw, 36px)
+          clamp(24px, 5vh, 36px);
         display: none;
         flex-direction: column;
         align-items: center;
@@ -59,11 +60,11 @@
       .title-art {
         width: 100%;
         max-width: 280px;
-        margin-top: 62px;
+        margin-top: clamp(24px, 5vh, 62px);
       }
 
       .tagline {
-        margin: 165px 0 55px;
+        margin: clamp(110px, 20vh, 165px) 0 clamp(32px, 6vh, 55px);
         font-size: 18px;
         line-height: 1.4;
       }
@@ -81,9 +82,9 @@
         border-radius: 999px;
         background: #ffffff;
         color: #2e32c5;
-        font-size: 18px;
+        font-size: clamp(16px, 4vw, 18px);
         font-weight: 600;
-        padding: 18px 0;
+        padding: clamp(14px, 2vh, 18px) 0;
         cursor: pointer;
         box-shadow: 0 12px 25px rgba(16, 12, 94, 0.35);
         transition: transform 0.2s;
@@ -94,29 +95,22 @@
       }
 
       .quiz-progress {
-        font-size: 16px;
+        font-size: clamp(14px, 3.5vw, 16px);
         letter-spacing: 0.05em;
       }
 
       .quiz-word {
-        font-size: 46px;
+        font-size: clamp(34px, 8vw, 46px);
         font-weight: 700;
-        margin-top: clamp(70px, 32vh, 160px);
+        margin-top: clamp(60px, 32vh, 160px);
       }
 
-      .quiz-screen {
-        justify-content: flex-start;
-        padding: 48px 36px 28px;
-      }
-
-      .meaning-screen {
-        justify-content: flex-start;
-        padding: 48px 36px 36px;
-      }
-
+      .quiz-screen,
+      .meaning-screen,
       .result-screen {
         justify-content: flex-start;
-        padding: 48px 36px 36px;
+        padding: clamp(32px, 6vh, 48px) clamp(20px, 6vw, 36px)
+          clamp(20px, 4vh, 32px);
       }
 
       .quiz-top {
@@ -167,12 +161,12 @@
       .quiz-actions {
         width: 100%;
         margin-top: auto;
-        padding-bottom: 12px;
+        padding-bottom: clamp(8px, 2vh, 16px);
       }
 
       .question-label {
         font-size: 14pt;
-        margin-bottom: 60px;
+        margin-bottom: clamp(28px, 6vh, 60px);
         opacity: 0.85;
       }
 
@@ -214,8 +208,8 @@
       }
 
       .meaning-text {
-        margin-top: 16px;
-        font-size: 18px;
+        margin-top: clamp(12px, 2vh, 16px);
+        font-size: clamp(16px, 4.5vw, 18px);
         line-height: 1.5;
       }
 
@@ -223,12 +217,12 @@
         width: 100%;
         display: flex;
         flex-direction: column;
-        gap: 18px;
+        gap: clamp(12px, 3vh, 18px);
         margin-top: auto;
       }
 
       .meaning-screen .quiz-word {
-        margin-top: clamp(40px, 28vh, 140px);
+        margin-top: clamp(40px, 30vh, 140px);
       }
 
       .result-headline {
@@ -237,28 +231,28 @@
       }
 
       .result-tagline {
-        margin: 32px 0 28px;
+        margin: clamp(24px, 6vh, 40px) 0 clamp(20px, 5vh, 28px);
         font-size: 18px;
         line-height: 1.4;
       }
 
       .result-score {
-        font-size: 90px;
+        font-size: clamp(60px, 18vw, 90px);
         line-height: 1;
         margin-bottom: 8px;
       }
 
       .result-max {
-        font-size: 26px;
+        font-size: clamp(22px, 6vw, 26px);
         opacity: 0.8;
-        margin-bottom: 171px;
+        margin-bottom: clamp(72px, 14vh, 140px);
       }
 
       .result-cta {
         width: 100%;
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: clamp(12px, 3vh, 16px);
         margin-top: auto;
       }
 
@@ -336,7 +330,7 @@
       table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 16px;
+        font-size: clamp(14px, 4vw, 16px);
       }
 
       th,
@@ -354,6 +348,17 @@
         .canvas {
           width: 100vw;
           height: min(812px, calc(100vw * 812 / 375));
+        }
+      }
+
+      @media (max-height: 720px) {
+        .tagline,
+        .result-tagline {
+          margin: clamp(64px, 18vh, 120px) 0 clamp(18px, 4vh, 36px);
+        }
+
+        .quiz-word {
+          margin-top: clamp(40px, 26vh, 110px);
         }
       }
     </style>
